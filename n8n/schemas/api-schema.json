@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GenomCP Workers API Schema",
+  "description": "JSON schemas for n8n integration with GenomCP Workers API",
+  "definitions": {
+    "PatientData": {
+      "type": "object",
+      "required": ["age", "sex", "phenotype"],
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "description": "Unique patient identifier"
+        },
+        "age": {
+          "type": "number",
+          "description": "Patient age in years"
+        },
+        "sex": {
+          "type": "string",
+          "enum": ["male", "female", "other"],
+          "description": "Patient biological sex"
+        },
+        "ethnicity": {
+          "type": "string",
+          "description": "Patient ethnicity"
+        },
+        "phenotype": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of phenotypic features"
+        },
+        "family_history": {
+          "type": "object",
+          "properties": {
+            "cancer_type": { "type": "string" },
+            "affected_relatives": { "type": "number" },
+            "inheritance_pattern": {
+              "type": "string",
+              "enum": ["autosomal_dominant", "autosomal_recessive", "x_linked", "unknown"]
+            },
+            "age_of_onset": { "type": "number" }
+          }
+        }
+      }
+    },
+    "VariantData": {
+      "type": "object",
+      "required": ["hgvs", "gene"],
+      "properties": {
+        "hgvs": {
+          "type": "string",
+          "description": "HGVS notation (e.g., BRAF:c.1799T>A)"
+        },
+        "gene": {
+          "type": "string",
+          "description": "Gene symbol (e.g., BRAF)"
+        },
+        "chromosome": { "type": "string" },
+        "position": { "type": "number" },
+        "ref": { "type": "string" },
+        "alt": { "type": "string" },
+        "significance": {
+          "type": "string",
+          "enum": ["pathogenic", "likely_pathogenic", "vus", "likely_benign", "benign"]
+        },
+        "zygosity": {
+          "type": "string",
+          "enum": ["heterozygous", "homozygous", "hemizygous"]
+        },
+        "allele_frequency": { "type": "number" }
+      }
+    },
+    "DiagnosisRequest": {
+      "type": "object",
+      "required": ["patient", "variants"],
+      "properties": {
+        "patient": { "$ref": "#/definitions/PatientData" },
+        "variants": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/VariantData" },
+          "minItems": 1
+        }
+      }
+    },
+    "VariantInterpretationRequest": {
+      "type": "object",
+      "required": ["variants"],
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of HGVS notations"
+        },
+        "context": {
+          "type": "string",
+          "description": "Clinical context (e.g., 'cancer_predisposition')"
+        }
+      }
+    },
+    "DrugResponseRequest": {
+      "type": "object",
+      "required": ["genes"],
+      "properties": {
+        "genes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of gene symbols"
+        },
+        "variants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of HGVS notations (optional)"
+        }
+      }
+    }
+  }
+}

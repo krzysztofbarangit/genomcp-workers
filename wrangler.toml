@@ -1,0 +1,53 @@
+name = "genomcp-workers"
+main = "src/index.ts"
+compatibility_date = "2025-11-28"
+workers_dev = true
+
+# KV Namespaces for fast caching
+[[kv_namespaces]]
+binding = "VARIANT_CACHE"
+id = "variant_cache_preview"
+preview_id = "variant_cache_preview"
+
+[[kv_namespaces]]
+binding = "GENE_CACHE"
+id = "gene_cache_preview"
+preview_id = "gene_cache_preview"
+
+# Durable Objects for persistent state
+[[durable_objects.bindings]]
+name = "VARIANT_REGISTRY"
+class_name = "VariantRegistry"
+script_name = "genomcp-workers"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["VariantRegistry"]
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+
+# Production environment
+[env.production]
+name = "genomcp-workers-prod"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+
+# Optional API Keys (set via: wrangler secret put <NAME>)
+# These are OPTIONAL - all APIs work without keys, but some have rate limits
+#
+# To set secrets:
+# wrangler secret put NCI_API_KEY
+# wrangler secret put PHARMGKB_API_KEY
+#
+# NCI_API_KEY - For NCI Clinical Trials API (optional, get from: https://clinicaltrialsapi.cancer.gov/)
+# PHARMGKB_API_KEY - For PharmGKB API (optional, most endpoints are public)
+#
+# NO OTHER EXTERNAL SERVERS REQUIRED!
+# All other APIs are public:
+# - BioThings Suite (MyVariant, MyGene, MyDisease, MyChem) - FREE, no auth
+# - Ensembl REST API - FREE, no auth
+# - NCBI E-utilities - FREE, no auth (but rate limited)
+# - ClinicalTrials.gov - FREE, no auth

@@ -1,0 +1,23 @@
+# Development environment variables
+# Copy this file to .dev.vars
+
+# Environment
+ENVIRONMENT=development
+
+# Optional API Keys (NOT REQUIRED for basic functionality)
+# All APIs work without keys, but may have rate limits
+
+# NCI Clinical Trials API (optional)
+# Get from: https://clinicaltrialsapi.cancer.gov/
+# NCI_API_KEY=your-nci-api-key-here
+
+# PharmGKB API (optional, most endpoints are public)
+# Get from: https://www.pharmgkb.org/page/dataUsagePolicy
+# PHARMGKB_API_KEY=your-pharmgkb-api-key-here
+
+# IMPORTANT: NO external MCP servers needed!
+# All data comes directly from public APIs:
+# - BioThings Suite (MyVariant, MyGene, etc.) - FREE, no auth
+# - Ensembl REST API - FREE, no auth
+# - NCBI E-utilities - FREE, no auth
+# - ClinicalTrials.gov - FREE, no auth

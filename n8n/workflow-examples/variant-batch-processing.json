@@ -1,0 +1,146 @@
+{
+  "name": "Batch Variant Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "filePath": "={{ $json.vcf_file_path }}"
+      },
+      "name": "Read VCF File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [50, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse VCF file and extract variants\nconst vcfData = $input.first().binary.data.toString('utf8');\nconst lines = vcfData.split('\\n').filter(line => !line.startsWith('#'));\n\nconst variants = lines\n  .filter(line => line.trim())\n  .slice(0, 100) // Process first 100 variants\n  .map(line => {\n    const fields = line.split('\\t');\n    const chrom = fields[0];\n    const pos = fields[1];\n    const ref = fields[3];\n    const alt = fields[4];\n    const info = fields[7];\n    \n    // Extract gene from INFO field (simplified)\n    const geneMatch = info.match(/GENE=([^;]+)/);\n    const gene = geneMatch ? geneMatch[1] : 'UNKNOWN';\n    \n    return `${gene}:${chrom}:${pos}:${ref}:${alt}`;\n  });\n\nreturn { variants };"
+      },
+      "name": "Parse VCF to Variants",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "name": "Split Into Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://genomcp-workers.your-account.workers.dev/api/variants/interpret",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "variants",
+              "value": "={{ $json.variants }}"
+            },
+            {
+              "name": "context",
+              "value": "clinical"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "name": "Interpret Variant Batch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate all batches\nconst allResults = [];\n\nfor (const item of $input.all()) {\n  if (item.json.variants) {\n    allResults.push(...item.json.variants);\n  }\n}\n\n// Filter for pathogenic variants\nconst pathogenic = allResults.filter(v => \n  v.clinical_significance === 'pathogenic' ||\n  v.clinical_significance === 'likely_pathogenic'\n);\n\nreturn {\n  total_variants: allResults.length,\n  pathogenic_count: pathogenic.length,\n  pathogenic_variants: pathogenic\n};"
+      },
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "filePath": "={{ $json.output_file || '/tmp/pathogenic_variants.json' }}",
+        "data": "={{ JSON.stringify($json, null, 2) }}"
+      },
+      "name": "Save Results",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Read VCF File": {
+      "main": [
+        [
+          {
+            "node": "Parse VCF to Variants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse VCF to Variants": {
+      "main": [
+        [
+          {
+            "node": "Split Into Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Batches": {
+      "main": [
+        [
+          {
+            "node": "Interpret Variant Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interpret Variant Batch": {
+      "main": [
+        [
+          {
+            "node": "Split Into Batches",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Save Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

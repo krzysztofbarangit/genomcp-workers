@@ -1,0 +1,108 @@
+{
+  "name": "Genomic Diagnosis Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://genomcp-workers.your-account.workers.dev/api/diagnosis",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "patient",
+              "value": "={{ $json.patient }}"
+            },
+            {
+              "name": "variants",
+              "value": "={{ $json.variants }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "name": "Get Genomic Diagnosis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Example patient data\nconst patient = {\n  age: 45,\n  sex: \"female\",\n  ethnicity: \"european\",\n  phenotype: [\n    \"hyperpigmentation\",\n    \"family_history_melanoma\"\n  ],\n  family_history: {\n    cancer_type: \"melanoma\",\n    affected_relatives: 2,\n    inheritance_pattern: \"autosomal_dominant\"\n  }\n};\n\n// Example variants\nconst variants = [\n  {\n    hgvs: \"BRAF:c.1799T>A\",\n    gene: \"BRAF\",\n    significance: \"pathogenic\",\n    zygosity: \"heterozygous\"\n  },\n  {\n    hgvs: \"TP53:p.R248Q\",\n    gene: \"TP53\",\n    significance: \"pathogenic\",\n    zygosity: \"heterozygous\"\n  }\n];\n\nreturn {\n  patient,\n  variants\n};"
+      },
+      "name": "Prepare Patient Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [50, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract key diagnosis information\nconst diagnosis = $input.first().json;\n\nconst summary = {\n  diagnosis_id: diagnosis.diagnosis_id,\n  condition: diagnosis.primary_diagnosis.condition,\n  confidence: diagnosis.primary_diagnosis.confidence,\n  genes_involved: diagnosis.primary_diagnosis.supporting_genes,\n  cancer_syndrome: diagnosis.cancer_risk?.syndrome,\n  lifetime_risk: diagnosis.cancer_risk?.lifetime_risk,\n  medications: diagnosis.drug_response?.medications.map(m => ({\n    name: m.name,\n    efficacy: m.efficacy,\n    evidence: m.evidence_level\n  })),\n  recommendations: diagnosis.interpretation.actionable_items\n};\n\nreturn { summary };"
+      },
+      "name": "Format Diagnosis Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://your-ehr-system.com/api/reports",
+        "authentication": "genericCredentialType",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "report",
+              "value": "={{ $json.summary }}"
+            }
+          ]
+        }
+      },
+      "name": "Send to EHR System",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Prepare Patient Data": {
+      "main": [
+        [
+          {
+            "node": "Get Genomic Diagnosis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Genomic Diagnosis": {
+      "main": [
+        [
+          {
+            "node": "Format Diagnosis Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Diagnosis Report": {
+      "main": [
+        [
+          {
+            "node": "Send to EHR System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

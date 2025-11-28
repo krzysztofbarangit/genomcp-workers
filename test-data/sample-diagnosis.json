@@ -1,0 +1,64 @@
+{
+  "patient": {
+    "patient_id": "test-patient-001",
+    "age": 45,
+    "sex": "female",
+    "ethnicity": "european",
+    "phenotype": [
+      "hyperpigmentation",
+      "family_history_melanoma",
+      "multiple_nevi"
+    ],
+    "family_history": {
+      "cancer_type": "melanoma",
+      "affected_relatives": 2,
+      "inheritance_pattern": "autosomal_dominant",
+      "age_of_onset": 38
+    },
+    "medical_history": [
+      "previous_melanoma_excision",
+      "dysplastic_nevus_syndrome"
+    ],
+    "current_medications": [
+      "immunotherapy"
+    ]
+  },
+  "variants": [
+    {
+      "hgvs": "BRAF:c.1799T>A",
+      "gene": "BRAF",
+      "chromosome": "7",
+      "position": 140453136,
+      "ref": "T",
+      "alt": "A",
+      "significance": "pathogenic",
+      "zygosity": "heterozygous",
+      "allele_frequency": 0.0001,
+      "inheritance": "somatic"
+    },
+    {
+      "hgvs": "TP53:p.R248Q",
+      "gene": "TP53",
+      "chromosome": "17",
+      "position": 7577548,
+      "ref": "C",
+      "alt": "T",
+      "significance": "pathogenic",
+      "zygosity": "heterozygous",
+      "allele_frequency": 0.00005,
+      "inheritance": "inherited"
+    },
+    {
+      "hgvs": "CDKN2A:c.301G>T",
+      "gene": "CDKN2A",
+      "chromosome": "9",
+      "position": 21971120,
+      "ref": "G",
+      "alt": "T",
+      "significance": "likely_pathogenic",
+      "zygosity": "heterozygous",
+      "allele_frequency": 0.0002,
+      "inheritance": "inherited"
+    }
+  ]
+}
