@@ -2,7 +2,10 @@
 
 **🎉 ZERO external servers required!** Pure Cloudflare Worker with direct API access to public genomic databases.
 
-[![Deploy](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/yourusername/genomcp-workers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
+[![Deploy](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/krzysztofbarangit/genomcp-workers)
 
 ## What is This?
 
@@ -237,7 +240,7 @@ If these work but Worker shows offline, it's likely a Worker network issue (very
 
 ## Contributing
 
-1. Fork the repository
+1. Fork the repository: https://github.com/krzysztofbarangit/genomcp-workers
 2. Create feature branch (`git checkout -b feature/amazing`)
 3. Commit changes (`git commit -m 'Add feature'`)
 4. Push to branch (`git push origin feature/amazing`)
