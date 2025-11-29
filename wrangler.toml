@@ -6,13 +6,11 @@ workers_dev = true
 # KV Namespaces for fast caching
 [[kv_namespaces]]
 binding = "VARIANT_CACHE"
-id = "variant_cache_preview"
-preview_id = "variant_cache_preview"
+id = "a3a131cd6a9845eeac194903dea13b44"
 
 [[kv_namespaces]]
 binding = "GENE_CACHE"
-id = "gene_cache_preview"
-preview_id = "gene_cache_preview"
+id = "62d366b675eb4c73b53df57f1f211e85"
 
 # Durable Objects for persistent state
 [[durable_objects.bindings]]
